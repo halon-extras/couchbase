@@ -1,0 +1,46 @@
+version: "2"
+services:
+  halon-smtpd:
+    build:
+      context: ./
+      dockerfile: ./Dockerfile
+      args:
+        HALON_REPO_USER: ${HALON_REPO_USER}
+        HALON_REPO_PASS: ${HALON_REPO_PASS}
+    volumes:
+      - ../:/couchbase
+      - ./smtpd/dist:/etc/halon
+      - halon-spool:/var/spool/halon
+    depends_on:
+      - couchbase
+  couchbase:
+    image: couchbase/server:8.0.2
+    ports:
+      - "8091:8091"
+      - "11210:11210"
+  couchbase-init:
+    image: couchbase/server:8.0.2
+    depends_on:
+      - couchbase
+    entrypoint: /bin/bash
+    command:
+      - -c
+      - |
+        until curl -s http://couchbase:8091/ui/index.html >/dev/null; do
+          sleep 1
+        done
+        /opt/couchbase/bin/couchbase-cli cluster-init \
+          --cluster couchbase:8091 \
+          --cluster-username Administrator \
+          --cluster-password password \
+          --services data \
+          --cluster-ramsize 256
+        /opt/couchbase/bin/couchbase-cli bucket-create \
+          --cluster couchbase:8091 \
+          --username Administrator \
+          --password password \
+          --bucket halon \
+          --bucket-type couchbase \
+          --bucket-ramsize 128
+volumes:
+  halon-spool:

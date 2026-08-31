@@ -1,0 +1,177 @@
+[
+	{
+		"name": "Couchbase",
+		"parameters": {
+			"required": [
+				{
+					"name": "profile",
+					"type": "string"
+				},
+				{
+					"name": "bucket",
+					"type": "string"
+				}
+			],
+			"optional": [
+				{
+					"name": "scope",
+					"type": "string"
+				},
+				{
+					"name": "collection",
+					"type": "string"
+				}
+			]
+		},
+		"methods": [
+			{
+				"name": "get",
+				"parameters": {
+					"required": [
+						{
+							"name": "key",
+							"type": "string"
+						}
+					],
+					"optional": [
+						{
+							"name": "options",
+							"type": "array"
+						}
+					]
+				},
+				"returnType": "array",
+				"detail": "Couchbase->get(string $key [, array $options]): array",
+				"value": "get($0)",
+				"documentation": "Get a binary value. Returns an array containing the value in the result property, or error details on failure. The timeout option is a non-negative integer in milliseconds.",
+				"link": "[Full documentation](https://github.com/halon-extras/couchbase)"
+			},
+			{
+				"name": "exists",
+				"parameters": {
+					"required": [
+						{
+							"name": "key",
+							"type": "string"
+						}
+					],
+					"optional": [
+						{
+							"name": "options",
+							"type": "array"
+						}
+					]
+				},
+				"returnType": "array",
+				"detail": "Couchbase->exists(string $key [, array $options]): array",
+				"value": "exists($0)",
+				"documentation": "Check whether a document exists. Returns an array containing a boolean in the result property, or error details on failure. The timeout option is a non-negative integer in milliseconds.",
+				"link": "[Full documentation](https://github.com/halon-extras/couchbase)"
+			},
+			{
+				"name": "set",
+				"parameters": {
+					"required": [
+						{
+							"name": "key",
+							"type": "string"
+						},
+						{
+							"name": "value",
+							"type": "string"
+						}
+					],
+					"optional": [
+						{
+							"name": "options",
+							"type": "array"
+						}
+					]
+				},
+				"returnType": "array",
+				"detail": "Couchbase->set(string $key, string $value [, array $options]): array",
+				"value": "set($0, $1)",
+				"documentation": "Upsert a binary value. Returns an array containing result => true, or error details on failure. Options are expiry as non-negative integer seconds (up to 50 years), timeout as non-negative integer milliseconds, and durability (none, majority, majority_and_persist_to_active, or persist_to_majority).",
+				"link": "[Full documentation](https://github.com/halon-extras/couchbase)"
+			},
+			{
+				"name": "delete",
+				"parameters": {
+					"required": [
+						{
+							"name": "key",
+							"type": "string"
+						}
+					],
+					"optional": [
+						{
+							"name": "options",
+							"type": "array"
+						}
+					]
+				},
+				"returnType": "array",
+				"detail": "Couchbase->delete(string $key [, array $options]): array",
+				"value": "delete($0)",
+				"documentation": "Delete a document. Returns an array containing result => true, or error details on failure. Options are timeout as non-negative integer milliseconds and durability (none, majority, majority_and_persist_to_active, or persist_to_majority).",
+				"link": "[Full documentation](https://github.com/halon-extras/couchbase)"
+			},
+			{
+				"name": "increment",
+				"parameters": {
+					"required": [
+						{
+							"name": "key",
+							"type": "string"
+						}
+					],
+					"optional": [
+						{
+							"name": "delta",
+							"type": "number"
+						},
+						{
+							"name": "options",
+							"type": "array"
+						}
+					]
+				},
+				"returnType": "array",
+				"detail": "Couchbase->increment(string $key [, number $delta [, array $options]]): array",
+				"value": "increment($0)",
+				"documentation": "Increment a counter by a non-negative integer delta, defaulting to 1, and return its new value in the result property, or error details on failure. The initial option creates a missing counter with that non-negative integer value. Other options are expiry as non-negative integer seconds (up to 50 years), timeout as non-negative integer milliseconds, and durability (none, majority, majority_and_persist_to_active, or persist_to_majority).",
+				"link": "[Full documentation](https://github.com/halon-extras/couchbase)"
+			},
+			{
+				"name": "decrement",
+				"parameters": {
+					"required": [
+						{
+							"name": "key",
+							"type": "string"
+						}
+					],
+					"optional": [
+						{
+							"name": "delta",
+							"type": "number"
+						},
+						{
+							"name": "options",
+							"type": "array"
+						}
+					]
+				},
+				"returnType": "array",
+				"detail": "Couchbase->decrement(string $key [, number $delta [, array $options]]): array",
+				"value": "decrement($0)",
+				"documentation": "Decrement a counter by a non-negative integer delta, defaulting to 1, and return its new value in the result property, or error details on failure. The initial option creates a missing counter with that non-negative integer value. Other options are expiry as non-negative integer seconds (up to 50 years), timeout as non-negative integer milliseconds, and durability (none, majority, majority_and_persist_to_active, or persist_to_majority).",
+				"link": "[Full documentation](https://github.com/halon-extras/couchbase)"
+			}
+		],
+		"detail": "Couchbase(string $profile, string $bucket[, string $scope[, string $collection]])",
+		"value": "Couchbase($0, $1)",
+		"documentation": "Create a Couchbase collection handle using a configured profile and bucket. Optionally select a scope and collection.",
+		"link": "[Full documentation](https://github.com/halon-extras/couchbase)"
+	}
+]

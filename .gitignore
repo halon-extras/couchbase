@@ -1,0 +1,5 @@
+*.so
+/build/dist
+/build/vscode
+license.key
+.DS_Store

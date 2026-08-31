@@ -1,0 +1,20 @@
+{
+	"name": "couchbase",
+	"dockerComposeFile": [
+		"docker-compose.yaml"
+	],
+	"workspaceFolder": "/couchbase",
+	"service": "halon-smtpd",
+	"overrideCommand": false,
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"halon.vscode-halon",
+				"halon.hsl-syntax",
+				"halon.hsl-linter",
+				"halon.hsl-debug",
+				"ms-vscode.cpptools-extension-pack"
+			]
+		}
+	}
+}

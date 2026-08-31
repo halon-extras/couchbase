@@ -1,0 +1,49 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"type": "object",
+	"description": "Configure Couchbase cluster connection profiles used by the Couchbase() function.",
+	"additionalProperties": false,
+	"required": [
+		"profiles"
+	],
+	"properties": {
+		"profiles": {
+			"type": "array",
+			"description": "Couchbase cluster connection profiles.",
+			"minItems": 1,
+			"items": {
+				"type": "object",
+				"description": "A Couchbase cluster connection profile.",
+				"additionalProperties": false,
+				"required": [
+					"id",
+					"connection_string",
+					"username",
+					"password"
+				],
+				"properties": {
+					"id": {
+						"type": "string",
+						"minLength": 1,
+						"description": "Unique profile ID passed to Couchbase()."
+					},
+					"connection_string": {
+						"type": "string",
+						"minLength": 1,
+						"description": "Couchbase connection string, for example couchbase://db.example.com or couchbases://db.example.com."
+					},
+					"username": {
+						"type": "string",
+						"minLength": 1,
+						"description": "Username used to authenticate with the cluster."
+					},
+					"password": {
+						"type": "string",
+						"minLength": 1,
+						"description": "Password used to authenticate with the cluster."
+					}
+				}
+			}
+		}
+	}
+}
