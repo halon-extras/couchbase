@@ -17,6 +17,8 @@
 #include <string>
 #include <type_traits>
 
+static std::string default_profile;
+static std::string default_bucket;
 static std::map<std::string, std::shared_ptr<couchbase::cluster>> profiles;
 
 static bool set_exception(HalonHSLContext* hhc, const std::string& message)
@@ -195,6 +197,17 @@ bool Halon_init(HalonInitContext* hic)
 {
 	HalonConfig* cfg;
 	HalonMTA_init_getinfo(hic, HALONMTA_INIT_CONFIG, nullptr, 0, &cfg, nullptr);
+
+	HalonConfig* hcDefault = HalonMTA_config_object_get(cfg, "default");
+	if (hcDefault)
+	{
+		const char* profile = HalonMTA_config_string_get(HalonMTA_config_object_get(hcDefault, "profile"), nullptr);
+		if (profile)
+			default_profile = profile;
+		const char* bucket = HalonMTA_config_string_get(HalonMTA_config_object_get(hcDefault, "bucket"), nullptr);
+		if (bucket)
+			default_bucket = bucket;
+	}
 
 	HalonConfig* hcProfiles = HalonMTA_config_object_get(cfg, "profiles");
 	if (hcProfiles)
@@ -548,13 +561,21 @@ static void Couchbase(HalonHSLContext* hhc, HalonHSLArguments* args, HalonHSLVal
 	std::string profile, bucket, scope, collection;
 	if (!get_argument_string(args, 0, profile))
 	{
-		set_exception(hhc, "bad or missing profile");
-		return;
+		if (default_profile.empty())
+		{
+			set_exception(hhc, "bad or missing profile");
+			return;
+		}
+		profile = default_profile;
 	}
 	if (!get_argument_string(args, 1, bucket))
 	{
-		set_exception(hhc, "bad or missing bucket");
-		return;
+		if (default_bucket.empty())
+		{
+			set_exception(hhc, "bad or missing bucket");
+			return;
+		}
+		bucket = default_bucket;
 	}
 	if (!get_argument_string(args, 2, scope, false))
 	{

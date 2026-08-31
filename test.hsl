@@ -16,3 +16,6 @@ echo $couchbase->set("json", ["foo"], [
     "format" => "json"
 ]);
 echo $couchbase->get("json");
+
+$couchbase = Couchbase();
+echo $couchbase->get("json");

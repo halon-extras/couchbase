@@ -7,6 +7,27 @@
 		"profiles"
 	],
 	"properties": {
+		"default": {
+			"type": "object",
+			"description": "Default profile and bucket.",
+			"additionalProperties": false,
+			"required": [
+				"profile",
+				"bucket"
+			],
+			"properties": {
+				"profile": {
+					"type": "string",
+					"minLength": 1,
+					"description": "The default profile."
+				},
+				"bucket": {
+					"type": "string",
+					"minLength": 1,
+					"description": "The default bucket."
+				}
+			}
+		},
 		"profiles": {
 			"type": "array",
 			"description": "Couchbase cluster connection profiles.",

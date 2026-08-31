@@ -19,6 +19,9 @@ environment:
 plugins:
   - id: couchbase
     config:
+      default:
+        profile: couchbase-database
+        bucket: halon
       profiles:
         - id: couchbase-database
           connection_string: couchbase://couchbase

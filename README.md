@@ -29,6 +29,9 @@ tdnf install -y halon-extras-couchbase
 Configure one or more Couchbase connection profiles in the plugin configuration:
 
 ```yaml
+default:
+  profile: couchbase-database
+  bucket: halon
 profiles:
   - id: couchbase-database
     connection_string: couchbase://couchbase.example.com
