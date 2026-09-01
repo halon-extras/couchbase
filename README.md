@@ -50,10 +50,11 @@ The plugin tries to connects all configured profiles during startup. Startup con
 
 The constructor needs to be [imported](https://docs.halon.io/hsl/structures.html#import) from the `extras://couchbase` module path.
 
-### Couchbase(profile, bucket [, scope [, collection]])
+### Couchbase([profile, bucket [, scope [, collection]]])
 
 Creates a Couchbase collection object.
 
+If `profile` and `bucket` are omitted the default profile and bucket from the configuration are used. If `profile` is set `bucket` also needs to be set.
 If `scope` is omitted, the bucket's default collection is used. If `scope` is provided and `collection` is omitted, the scope's default collection is used.
 
 **Params**

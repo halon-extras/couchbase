@@ -2,7 +2,8 @@
 	{
 		"name": "Couchbase",
 		"parameters": {
-			"required": [
+			"required": [],
+			"optional": [
 				{
 					"name": "profile",
 					"type": "string"
@@ -10,9 +11,7 @@
 				{
 					"name": "bucket",
 					"type": "string"
-				}
-			],
-			"optional": [
+				},
 				{
 					"name": "scope",
 					"type": "string"
@@ -171,7 +170,7 @@
 		],
 		"detail": "Couchbase(string $profile, string $bucket[, string $scope[, string $collection]])",
 		"value": "Couchbase($0, $1)",
-		"documentation": "Create a Couchbase collection handle using a configured profile and bucket. Optionally select a scope and collection.",
+		"documentation": "Create a Couchbase collection handle. Optionally select a configured profile and bucket, scope, and collection. If profile is set bucket also need to bet set.",
 		"link": "[Full documentation](https://github.com/halon-extras/couchbase)"
 	}
 ]
