@@ -5,7 +5,9 @@ ARG TARGETARCH
 ARG TARGETOS
 
 ARG HALON_REPO_USER
+ENV HALON_REPO_USER=$HALON_REPO_USER
 ARG HALON_REPO_PASS
+ENV HALON_REPO_PASS=$HALON_REPO_PASS
 
 RUN apt-get update && apt-get install -y wget gnupg
 RUN apt-get update && apt-get install -y apt-transport-https
