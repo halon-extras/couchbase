@@ -38,9 +38,46 @@
 				"additionalProperties": false,
 				"required": [
 					"id",
-					"connection_string",
-					"username",
-					"password"
+					"connection_string"
+				],
+				"oneOf": [
+					{
+						"required": [
+							"certificate",
+							"private_key"
+						],
+						"properties": {
+							"connection_string": {
+								"pattern": "^couchbases://"
+							}
+						},
+						"not": {
+							"anyOf": [
+								{
+									"required": ["username"]
+								},
+								{
+									"required": ["password"]
+								}
+							]
+						}
+					},
+					{
+						"required": [
+							"username",
+							"password"
+						],
+						"not": {
+							"anyOf": [
+								{
+									"required": ["certificate"]
+								},
+								{
+									"required": ["private_key"]
+								}
+							]
+						}
+					}
 				],
 				"properties": {
 					"id": {
@@ -62,6 +99,21 @@
 						"type": "string",
 						"minLength": 1,
 						"description": "Password used to authenticate with the cluster."
+					},
+					"certificate": {
+						"type": "string",
+						"minLength": 1,
+						"description": "Path to the client certificate used to authenticate with the cluster."
+					},
+					"private_key": {
+						"type": "string",
+						"minLength": 1,
+						"description": "Path to the client private key used to authenticate with the cluster."
+					},
+					"trust_store": {
+						"type": "string",
+						"minLength": 1,
+						"description": "Path to the CA certificate used to verify the cluster."
 					}
 				}
 			}

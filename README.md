@@ -39,12 +39,28 @@ profiles:
     password: secret
 ```
 
+Certificate authentication can be used instead of a username and password. It requires a TLS connection string:
+
+```yaml
+profiles:
+  - id: couchbase-database
+    connection_string: couchbases://couchbase.example.com
+    certificate: /etc/couchbase/client.pem
+    private_key: /etc/couchbase/client.key
+    trust_store: /etc/couchbase/ca.pem
+```
+
 - `id` string - Unique profile name passed to the `Couchbase` constructor
 - `connection_string` string - Couchbase connection string, such as `couchbase://couchbase.example.com` or `couchbases://couchbase.example.com`
-- `username` string - Couchbase username
-- `password` string - Couchbase password
+- `username` string - Couchbase username; must be provided together with `password`
+- `password` string - Couchbase password; must be provided together with `username`
+- `certificate` string - Path to the client certificate; must be provided together with `private_key` and requires a `couchbases://` connection string
+- `private_key` string - Path to the client certificate's private key; must be provided together with `certificate`
+- `trust_store` string - Optional path to the CA certificate used to verify a TLS-enabled cluster
 
-The plugin tries to connects all configured profiles during startup. Startup connection errors are permanent, but later errors will make functions return an error and a later retry.
+Each profile must use exactly one authentication method: either `username` and `password`, or `certificate` and `private_key`. The two methods cannot be combined.
+
+The plugin tries to connect all configured profiles during startup. Startup connection errors are permanent, but later errors will make functions return an error and a later retry.
 
 ## Exported functions
 

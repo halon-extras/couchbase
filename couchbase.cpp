@@ -15,6 +15,7 @@
 #include <cmath>
 #include <memory>
 #include <string>
+#include <optional>
 #include <type_traits>
 
 static std::string default_profile;
@@ -230,22 +231,43 @@ bool Halon_init(HalonInitContext* hic)
 				return false;
 			}
 
-			const char* username = HalonMTA_config_string_get(HalonMTA_config_object_get(cfgp, "username"), nullptr);
-			if (!username)
+			std::optional<couchbase::cluster_options> options;
+
+			const char* certificate = HalonMTA_config_string_get(HalonMTA_config_object_get(cfgp, "certificate"), nullptr);
+			if (certificate)
 			{
-				syslog(LOG_CRIT, "couchbase: missing username");
-				return false;
+				const char* private_key = HalonMTA_config_string_get(HalonMTA_config_object_get(cfgp, "private_key"), nullptr);
+				if (!private_key)
+				{
+					syslog(LOG_CRIT, "couchbase: missing private_key");
+					return false;
+				}
+				options.emplace(couchbase::certificate_authenticator{ certificate, private_key });
+			}
+			else
+			{
+				const char* username = HalonMTA_config_string_get(HalonMTA_config_object_get(cfgp, "username"), nullptr);
+				if (!username)
+				{
+					syslog(LOG_CRIT, "couchbase: missing username");
+					return false;
+				}
+
+				const char* password = HalonMTA_config_string_get(HalonMTA_config_object_get(cfgp, "password"), nullptr);
+				if (!password)
+				{
+					syslog(LOG_CRIT, "couchbase: missing password");
+					return false;
+				}
+
+				options.emplace(username, password);
 			}
 
-			const char* password = HalonMTA_config_string_get(HalonMTA_config_object_get(cfgp, "password"), nullptr);
-			if (!password)
-			{
-				syslog(LOG_CRIT, "couchbase: missing password");
-				return false;
-			}
+			const char* trust_store = HalonMTA_config_string_get(HalonMTA_config_object_get(cfgp, "trust_store"), nullptr);
+			if (trust_store)
+				options->security().trust_certificate(trust_store);
 
-			couchbase::cluster_options options(username, password);
-			auto [err, cluster] = couchbase::cluster::connect(connection_string, options).get();
+			auto [err, cluster] = couchbase::cluster::connect(connection_string, *options).get();
 			if (err)
 			{
 				std::string context = err.ctx() ? err.ctx().to_json() : "{}";
