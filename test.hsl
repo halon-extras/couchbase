@@ -19,3 +19,20 @@ echo $couchbase->get("json");
 
 $couchbase = Couchbase();
 echo $couchbase->get("json");
+
+$couchbase = Couchbase("couchbase-database-tls", "halon");
+echo $couchbase->set("foo", "bar");
+echo $couchbase->get("foo");
+echo $couchbase->increment("counter", 10, [
+    "initial" => 0
+]);
+echo $couchbase->decrement("counter", 3, [
+    "initial" => 0
+]);
+echo $couchbase->get("counter");
+echo $couchbase->exists("counter");
+echo $couchbase->exists("counter2");
+echo $couchbase->set("json", ["foo"], [
+    "format" => "json"
+]);
+echo $couchbase->get("json");

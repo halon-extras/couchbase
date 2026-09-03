@@ -12,7 +12,10 @@ services:
       - ./smtpd/dist:/etc/halon
       - halon-spool:/var/spool/halon
     depends_on:
-      - couchbase
+      couchbase-init:
+        condition: service_completed_successfully
+      couchbase-tls-init:
+        condition: service_completed_successfully
   couchbase:
     image: couchbase/server:8.0.2
     ports:
@@ -26,6 +29,11 @@ services:
     command:
       - -c
       - |
+        if [ -f "/opt/couchbase/var/.tls-init-done" ]; then
+          echo "Couchbase TLS already initialized"
+          exit 0
+        fi
+        echo "hello" > /opt/couchbase/var/.tls-init-done
         until curl -s http://couchbase:8091/ui/index.html >/dev/null; do
           sleep 1
         done
@@ -42,5 +50,68 @@ services:
           --bucket halon \
           --bucket-type couchbase \
           --bucket-ramsize 128
+  couchbase-tls:
+    image: couchbase/server:8.0.2
+    hostname: couchbase-tls
+    ports:
+      - "18091:8091"
+      - "11207:11207"
+    volumes:
+      - couchbase-tls-data:/opt/couchbase/var
+  couchbase-tls-init:
+    image: couchbase/server:8.0.2
+    depends_on:
+      - couchbase-tls
+    volumes:
+      - couchbase-tls-data:/opt/couchbase/var
+      - ../couchbase-ca.pem:/certs/ca.pem:ro
+      - ../couchbase-server.pem:/certs/server.pem:ro
+      - ../couchbase-server.key:/certs/server.key:ro
+    entrypoint: /bin/bash
+    command:
+      - -c
+      - |
+        set -e
+        if [ -f "/opt/couchbase/var/.tls-init-done" ]; then
+          echo "Couchbase TLS already initialized"
+          exit 0
+        fi
+        echo "hello" > /opt/couchbase/var/.tls-init-done
+        until curl -s http://couchbase-tls:8091/ui/index.html >/dev/null; do
+          sleep 1
+        done
+        /opt/couchbase/bin/couchbase-cli cluster-init \
+          --cluster couchbase-tls:8091 \
+          --cluster-username Administrator \
+          --cluster-password password \
+          --services data \
+          --cluster-ramsize 256
+        /opt/couchbase/bin/couchbase-cli bucket-create \
+          --cluster couchbase-tls:8091 \
+          --username Administrator \
+          --password password \
+          --bucket halon \
+          --bucket-type couchbase \
+          --bucket-ramsize 128
+        mkdir -p /opt/couchbase/var/lib/couchbase/inbox/CA
+        cp /certs/server.pem /opt/couchbase/var/lib/couchbase/inbox/chain.pem
+        cp /certs/server.key /opt/couchbase/var/lib/couchbase/inbox/pkey.key
+        cp /certs/ca.pem /opt/couchbase/var/lib/couchbase/inbox/CA/ca.pem
+        chown -R couchbase:couchbase /opt/couchbase/var/lib/couchbase/inbox
+        chmod 600 /opt/couchbase/var/lib/couchbase/inbox/pkey.key
+        curl --fail --silent --show-error \
+          --user Administrator:password \
+          --request POST \
+          http://couchbase-tls:8091/node/controller/loadTrustedCAs
+        curl --fail --silent --show-error \
+          --user Administrator:password \
+          --request POST \
+          http://couchbase-tls:8091/node/controller/reloadCertificate
+        curl --fail --silent --show-error \
+          --user Administrator:password \
+          --header 'Content-Type: application/json' \
+          --data-binary '{"state":"enable","prefixes":[{"path":"subject.cn","prefix":"","delimiter":""}]}' \
+          http://couchbase-tls:8091/settings/clientCertAuth
 volumes:
   halon-spool:
+  couchbase-tls-data:

@@ -20,6 +20,11 @@ plugins:
       id: couchbase-database
       password: password
       username: Administrator
+    - certificate: /couchbase/couchbase-client.pem
+      connection_string: couchbases://couchbase-tls
+      id: couchbase-database-tls
+      private_key: /couchbase/couchbase-client.key
+      trust_store: /couchbase/couchbase-ca.pem
   id: couchbase
 servers:
 - id: default
