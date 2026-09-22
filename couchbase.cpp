@@ -11,16 +11,56 @@
 #include <couchbase/remove_options.hxx>
 #include <couchbase/increment_options.hxx>
 #include <couchbase/decrement_options.hxx>
+#include <couchbase/logger.hxx>
 #include <chrono>
 #include <cmath>
 #include <memory>
 #include <string>
+#include <string_view>
 #include <optional>
 #include <type_traits>
 
 static std::string default_profile;
 static std::string default_bucket;
 static std::map<std::string, std::shared_ptr<couchbase::cluster>> profiles;
+
+static bool parse_log_level(const std::string& name, couchbase::logger::log_level& level)
+{
+	if (name == "off")
+		level = couchbase::logger::log_level::off;
+	else if (name == "critical")
+		level = couchbase::logger::log_level::critical;
+	else if (name == "error")
+		level = couchbase::logger::log_level::error;
+	else if (name == "warn")
+		level = couchbase::logger::log_level::warn;
+	else if (name == "info")
+		level = couchbase::logger::log_level::info;
+	else if (name == "debug")
+		level = couchbase::logger::log_level::debug;
+	else if (name == "trace")
+		level = couchbase::logger::log_level::trace;
+	else
+		return false;
+	return true;
+}
+
+static int log_level_syslog_priority(couchbase::logger::log_level level)
+{
+	switch (level)
+	{
+		case couchbase::logger::log_level::critical:
+			return LOG_CRIT;
+		case couchbase::logger::log_level::error:
+			return LOG_ERR;
+		case couchbase::logger::log_level::warn:
+			return LOG_WARNING;
+		case couchbase::logger::log_level::info:
+			return LOG_INFO;
+		default:
+			return LOG_DEBUG;
+	}
+}
 
 static bool set_exception(HalonHSLContext* hhc, const std::string& message)
 {
@@ -199,6 +239,23 @@ bool Halon_init(HalonInitContext* hic)
 	HalonConfig* cfg;
 	HalonMTA_init_getinfo(hic, HALONMTA_INIT_CONFIG, nullptr, 0, &cfg, nullptr);
 
+	couchbase::logger::log_level log_level = couchbase::logger::log_level::off;
+	const char* log_level_name = HalonMTA_config_string_get(HalonMTA_config_object_get(cfg, "log_level"), nullptr);
+	if (log_level_name && !parse_log_level(log_level_name, log_level))
+	{
+		syslog(LOG_CRIT, "couchbase: invalid log_level: %s", log_level_name);
+		return false;
+	}
+
+	if (log_level != couchbase::logger::log_level::off)
+	{
+		couchbase::logger::register_log_callback([log_level](std::string_view message, couchbase::logger::log_level message_level, const couchbase::logger::log_location&) {
+			if (message_level < log_level)
+				return;
+			syslog(log_level_syslog_priority(message_level), "couchbase: %.*s", static_cast<int>(message.size()), message.data());
+		});
+	}
+
 	HalonConfig* hcDefault = HalonMTA_config_object_get(cfg, "default");
 	if (hcDefault)
 	{
@@ -294,6 +351,7 @@ void Halon_cleanup()
 {
 	for (auto& profile : profiles)
 		profile.second->close().get();
+	couchbase::logger::unregister_log_callback();
 }
 
 static void Couchbase_get(HalonHSLContext* hhc, HalonHSLArguments* args, HalonHSLValue* ret)

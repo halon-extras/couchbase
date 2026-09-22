@@ -7,6 +7,20 @@
 		"profiles"
 	],
 	"properties": {
+		"log_level": {
+			"type": "string",
+			"description": "Logging level.",
+			"enum": [
+				"off",
+				"critical",
+				"error",
+				"warn",
+				"info",
+				"debug",
+				"trace"
+			],
+			"default": "off"
+		},
 		"default": {
 			"type": "object",
 			"description": "Default profile and bucket.",
@@ -54,10 +68,14 @@
 						"not": {
 							"anyOf": [
 								{
-									"required": ["username"]
+									"required": [
+										"username"
+									]
 								},
 								{
-									"required": ["password"]
+									"required": [
+										"password"
+									]
 								}
 							]
 						}
@@ -70,10 +88,14 @@
 						"not": {
 							"anyOf": [
 								{
-									"required": ["certificate"]
+									"required": [
+										"certificate"
+									]
 								},
 								{
-									"required": ["private_key"]
+									"required": [
+										"private_key"
+									]
 								}
 							]
 						}

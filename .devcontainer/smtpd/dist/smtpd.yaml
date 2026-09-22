@@ -15,6 +15,7 @@ plugins:
     default:
       bucket: halon
       profile: couchbase-database
+    log_level: 'off'
     profiles:
     - connection_string: couchbase://couchbase
       id: couchbase-database

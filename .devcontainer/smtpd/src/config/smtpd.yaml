@@ -19,6 +19,7 @@ environment:
 plugins:
   - id: couchbase
     config:
+      log_level: "off"
       default:
         profile: couchbase-database
         bucket: halon
